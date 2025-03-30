@@ -22,6 +22,13 @@ class TodoDatabase {
     });
   }
 
+  addTodo(todo) {
+    if (!todo.description || todo.completed === undefined) {
+      throw new Error("This is not a todo");
+    }
+    this.todos.push(todo);
+  }
+
   createTask(task) {
     const taskStatus = this.createElement(
       "input",
