@@ -1,5 +1,6 @@
 class TodoDatabase {
   toDoCount = 0;
+  todos = [];
   constructor(todoListSelector = ".todo-list") {
     this.todoList = document.querySelector(todoListSelector);
     this.addButton = document.querySelector(".add-task");
