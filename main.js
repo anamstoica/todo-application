@@ -1,5 +1,5 @@
 class TodoDatabase {
-  toDoCount = 0;
+  todoCount = 0;
   todos = [];
   constructor(todoListSelector = ".todo-list") {
     this.todoList = document.querySelector(todoListSelector);
@@ -10,7 +10,7 @@ class TodoDatabase {
       const validationMessage = document.querySelector(".validation-message");
 
       if (taskInputElement.value.length > 0) {
-        this.createTask({
+        this.createTodo({
           description: taskInputElement.value,
           completed: false,
         });
@@ -22,6 +22,11 @@ class TodoDatabase {
     });
   }
 
+  createTodo(todo) {
+    this.addTodo(todo);
+    this.render();
+  }
+
   addTodo(todo) {
     if (!todo.description || todo.completed === undefined) {
       throw new Error("This is not a todo");
@@ -29,116 +34,30 @@ class TodoDatabase {
     this.todos.push(todo);
   }
 
-  createTask(task) {
-    const taskStatus = this.createElement(
-      "input",
-      undefined,
-      "checkbox-container",
-      "change",
-      () => {
-        if (taskStatus.checked) {
-          taskDescription.classList.add("crossed-out");
-        } else {
-          taskDescription.classList.remove("crossed-out");
-        }
-      }
-    );
-    taskStatus.type = "checkbox";
-    taskStatus.checked = task.completed;
-
-    const taskDescription = this.createElement("p", task.description);
-
-    const listItem = this.createElement("li");
-
-    const taskRemoved = this.createElement(
-      "span",
-      "✖",
-      "remove-task",
-      "click",
-      () => {
-        listItem.remove();
-        this.countingToDos();
-      }
-    );
-
-    const editTask = this.createElement(
-      "span",
-      "✐ᝰ",
-      "edit-task",
-      "click",
-      () => {
-        const inputField = this.createElement(
-          "input",
-          taskDescription.textContent,
-          undefined,
-          "blur",
-          () => {
-            taskDescription.textContent =
-              inputField.value || taskDescription.textContent;
-            listItem.replaceChild(taskDescription, inputField);
-          }
-        );
-        listItem.replaceChild(inputField, taskDescription);
-        inputField.type = "text";
-        inputField.value = taskDescription.textContent;
-        inputField.focus();
-      }
-    );
-
-    const clearTask = document.querySelector(".delete-button");
-    clearTask.addEventListener("click", () => {
-      this.todoList.innerHTML = "";
-      this.countingToDos();
-    });
-
-    listItem.appendChild(taskStatus);
-    listItem.appendChild(taskDescription);
-    listItem.appendChild(editTask);
-    listItem.appendChild(taskRemoved);
-
-    this.todoList.appendChild(listItem);
-    this.countingToDos();
+  updateTodo(index, newDescription) {
+    if (index < 0 || index >= this.todos.length) return;
+    this.todos[index].description = newDescription;
+    this.render();
   }
 
-  countingToDos() {
-    this.toDoCount = document.querySelectorAll("li").length;
-    const toDoText = document.querySelector(".todo-count");
-    toDoText.innerHTML = this.toDoCount;
+  removeTask(index) {
+    if (index < 0 || index >= this.todos.length) return;
+    this.todos.splice(index, 1);
+    this.render();
   }
 
-  createElement(
-    elementType,
-    content = "",
-    className = "",
-    event,
-    addEventListener,
-    querySelector
-  ) {
-    const element = document.createElement(elementType);
+  clearTodos() {
+    this.todos = [];
+    this.render();
+  }
 
-    if (content) {
-      element.innerHTML = content;
-    }
-
-    if (className) {
-      element.classList.add(className);
-    }
-
-    if (event && addEventListener) {
-      element.addEventListener(event, addEventListener);
-    }
-
-    if (querySelector) {
-      const targetElement = document.querySelector(querySelector);
-      targetElement.appendChild(element);
-    }
-
-    return element;
+  countTodos() {
+    this.todoCount = this.todos.length;
   }
 
   render() {
-    const toDoList = document.querySelector(".todo-list");
     this.todoList.innerHTML = "";
+    const todoList = this.todoList;
 
     this.todos.forEach((todo, index) => {
       const listItem = document.createElement("li");
@@ -184,5 +103,5 @@ class TodoDatabase {
 
 const myDatabase = new TodoDatabase();
 
-myDatabase.createTask({ description: "Get groceries", completed: false });
-myDatabase.createTask({ description: "Finish homework", completed: true });
+myDatabase.createTodo({ description: "Get groceries", completed: false });
+myDatabase.createTodo({ description: "Finish homework", completed: true });
